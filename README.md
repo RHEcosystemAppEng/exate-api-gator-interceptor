@@ -50,6 +50,24 @@ The *Interceptor App* image is pushed to [quay.io/ecosystem-appeng/gator-api-int
 | api.gator.third-party-name         | API_GATOR_THIRD_PARTY_NAME         |    No    |                              |
 | api.gator.third-party-id           | API_GATOR_THIRD_PARTY_ID           |    No    |                              |
 
+## Local Container Run
+
+> The following example only uses mandatory properties. View the above table for all properties.
+> Use API-Gator documentation for the potential values and types.
+
+```shell
+podman run --rm -p 8082:8082 --network=host \
+-e TARGET_SERVER_PORT='8080' \
+-e API_GATOR_API_KEY='api-key-goes-here' \
+-e API_GATOR_CLIENT_ID='client-id-goes-here' \
+-e API_GATOR_CLIENT_SECRET='client-secret-goes-here' \
+-e API_GATOR_MANIFEST_NAME='Employee' \
+-e API_GATOR_JOB_TYPE='DataMasking' \
+-e API_GATOR_COUNTRY_CODE='GB' \
+-e API_GATOR_PROTECT_NULL_VALUES='false' \
+-e API_GATOR_PRESERVE_STRING_LENGTH='true' \
+quay.io/ecosystem-appeng/gator-api-interceptor:tag-goes-here
+```
 
 <!-- Links -->
 [0]: https://quarkus.io/
