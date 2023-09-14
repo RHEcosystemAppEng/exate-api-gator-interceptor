@@ -2,6 +2,7 @@ package exate.gator.interceptor.api;
 
 import java.util.Objects;
 
+/** Record for serializing the payload for sending DATASET requests to API-Gator. */
 public record DatasetPayload(
     String manifestName,
     JobType jobType,
@@ -39,6 +40,7 @@ public record DatasetPayload(
         JSON, XML, SQL;
     }
 
+    /** Verifying properties marked as mandatory in API-Gator documentation. */
     public DatasetPayload {
         Objects.requireNonNull(manifestName);
         Objects.requireNonNull(jobType);

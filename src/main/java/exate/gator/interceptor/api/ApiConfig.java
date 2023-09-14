@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.Optional;
 
+/** Configuration for API-Gator access. */
 @ConfigMapping(prefix = "api.gator")
 public interface ApiConfig {
     @NotBlank

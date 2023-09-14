@@ -10,14 +10,26 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+/** Use the functions in this static class for creating payload to be used in API-Gator requests. */
 public class PayloadFactory {
     private PayloadFactory() {}
 
+    /**
+     * Create a payload for TOKEN requests to API-Gator.
+     * @param config ApiConfig instance for creating the payload with its properties.
+     * @return a payload ready to be sent for TOKEN requests.
+     */
     public static TokenPayload createTokenPayload(ApiConfig config) {
         return new TokenPayload(config.clientId(), config.clientSecret(), config.grantType());
     }
 
-    public static DatasetPayload createDatasetPayload(ApiConfig config, HttpResponse<Buffer> targetResponse) {
+    /**
+     * Create a payload for DATASET requests to API-Gator.
+     * @param config ApiConfig instance for creating the payload with.
+     * @param dataset the dataset is the body from the original service response required to be Gator'ed.
+     * @return a payload ready to be sent for DATASET requests.
+     */
+    public static DatasetPayload createDatasetPayload(ApiConfig config, String dataset) {
         return new DatasetPayload(
             config.manifestName(),
             config.jobType(),
@@ -31,7 +43,7 @@ public class PayloadFactory {
             config.dataUsageId().orElse(null),
             config.protectNullValues(),
             config.restrictedText().orElse(null),
-            targetResponse.bodyAsString(),
+            dataset,
             config.preserveStringLength(),
             config.sqlType().orElse(null),
             config.classificationModel().orElse(null));

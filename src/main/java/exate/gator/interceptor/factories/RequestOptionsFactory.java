@@ -9,9 +9,16 @@ import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.RequestOptions;
 
+/** Use the functions in this static class for creating RequestOptions for the various target/api-gator requests. */
 public class RequestOptionsFactory {
     private RequestOptionsFactory() {}
 
+    /**
+     * Create RequestOptions for sending requests to the underlying target service.
+     * @param target TargetConfig for the target service.
+     * @param originRequest Original request send to server, we use it for grabbing the original header and uri.
+     * @return options for using with request to the target service.
+     */
     public static RequestOptions createTargetOptions(TargetConfig target, HttpServerRequest originRequest) {
         return new RequestOptions()
             .setHost(target.host())
@@ -20,6 +27,11 @@ public class RequestOptionsFactory {
             .setURI(originRequest.uri());
     }
 
+    /**
+     * Create RequestOptions for sending requests to API-Gator's TOKEN endpoint.
+     * @param config ApiConfig instance for creating the payload with its properties.
+     * @return options for using with TOKEN requests to API-Gator.
+     */
     public static RequestOptions createTokenOptions(ApiConfig config) {
         return new RequestOptions()
             .setHost(config.host())
@@ -29,6 +41,12 @@ public class RequestOptionsFactory {
             .putHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded");
     }
 
+    /**
+     * Create RequestOptions for sending requests to API-Gator's DATASET endpoint.
+     * @param config ApiConfig instance for creating the payload with its properties.
+     * @param tokenResponse the response from the token endpoint is required for grabbing the token and type.
+     * @return options for using with DATASET requests to API-Gator.
+     */
     public static RequestOptions createDatasetOptions(ApiConfig config, TokenResponse tokenResponse) {
         return new RequestOptions()
             .setHost(config.host())

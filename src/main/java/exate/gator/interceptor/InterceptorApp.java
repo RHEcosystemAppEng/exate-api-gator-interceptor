@@ -23,15 +23,16 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.Objects;
 
+/** Main application entrypoint, interception occurs here. */
 @ApplicationScoped
-public class TrafficInterceptor {
+public class InterceptorApp {
     private final WebClient client;
     private final ObjectMapper mapper;
     private final TargetConfig target;
     private final ApiConfig config;
 
     @Inject
-    public TrafficInterceptor(WebClient client, ObjectMapper mapper, TargetConfig target, ApiConfig config) {
+    public InterceptorApp(WebClient client, ObjectMapper mapper, TargetConfig target, ApiConfig config) {
         this.client = client;
         this.mapper = mapper;
         this.target = target;
@@ -40,15 +41,21 @@ public class TrafficInterceptor {
 
     @PostConstruct
     void initialize() {
+        // this allows us to set null to values for non-mandatory fields.
+        // null values will not be included for serializing/deserializing.
         this.mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
     }
 
+    /**
+     * Main entrypoint for the interceptor application, all requests stars here.
+     * @param context injected by Quarkus, used to handle requests and send responses.
+     */
     @Route(regex = ".*")
     public void handle(RoutingContext context) {
         Log.debugf("got new request, %s", context.request().absoluteURI());
         // create target request options using origin request and target host and port
         var targetRequestOpts = RequestOptionsFactory.createTargetOptions(target, context.request());
-        // wrap target request
+        // wrap target request with our own
         var targetRequest = this.client.request(context.request().method(), targetRequestOpts);
         Log.info("proxying request to target");
         targetRequest
@@ -58,6 +65,11 @@ public class TrafficInterceptor {
             .onFailure(handleExceptions("failed proxying request to target", 500, context));
     }
 
+    /**
+     * Used for handling responses from the underlying target service. Bypassing API-Gator occurs here.
+     * @param context route context used to handle requests and send responses.
+     * @return a lambda function handling the underlying target service responses.
+     */
     private Handler<HttpResponse<Buffer>> handlerTargetResponse(RoutingContext context) {
         return targetResponse -> {
             Log.info("proxying request to target successful");
@@ -90,6 +102,12 @@ public class TrafficInterceptor {
         };
     }
 
+    /**
+     * Used for handling responses from API-Gator's TOKEN endpoint.
+     * @param context route context used to handle requests and send responses.
+     * @param targetResponse the response from the underlying target service is required for creating DATASET requests.
+     * @return a lambda function handling API-Gator's TOKEN responses.
+     */
     private Handler<HttpResponse<Buffer>> handleTokenResponse(RoutingContext context, HttpResponse<Buffer> targetResponse) {
         return tokenResponse -> {
             Log.info("sending token request to gator successful");
@@ -107,7 +125,7 @@ public class TrafficInterceptor {
             // create dataset request options
             var datasetReqOpts = RequestOptionsFactory.createDatasetOptions(this.config, parsedTokenResp);
             // build dataset request payload
-            var datasetReqPayload = PayloadFactory.createDatasetPayload(this.config, targetResponse);
+            var datasetReqPayload = PayloadFactory.createDatasetPayload(this.config, targetResponse.bodyAsString());
             // create dataset request
             var datasetRequest = this.client.request(HttpMethod.POST, datasetReqOpts);
             Log.info("sending dataset request to gator");
@@ -126,10 +144,16 @@ public class TrafficInterceptor {
         };
     }
 
+    /**
+     * Used for handling responses from API-Gator's DATASET endpoint.
+     * @param context route context used to handle requests and send responses.
+     * @param targetResponse the underlying target service original response is required for creating the final response.
+     * @return a lambda function handling API-Gator's DATASET responses.
+     */
     private Handler<HttpResponse<Buffer>> handleDatasetResponse(RoutingContext context, HttpResponse<Buffer> targetResponse) {
         return datasetResponse -> {
             Log.info("sending dataset request to gator successful");
-            if (targetResponse.statusCode() != 200) {
+            if (datasetResponse.statusCode() != 200) {
                 handleErrors(datasetResponse, context);
                 return;
             }

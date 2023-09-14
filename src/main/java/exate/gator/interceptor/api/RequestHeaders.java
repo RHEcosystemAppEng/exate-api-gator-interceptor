@@ -1,5 +1,6 @@
 package exate.gator.interceptor.api;
 
+/** Various headers used by API-Gator and the interceptor application. */
 public enum RequestHeaders {
     X_Data_Set_Type,
     X_Api_Key,
