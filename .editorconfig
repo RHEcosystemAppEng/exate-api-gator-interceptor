@@ -10,4 +10,5 @@ max_line_length = 120
 tab_width = 4
 
 [*.xml]
+indent_size = 2
 tab_width = 2
