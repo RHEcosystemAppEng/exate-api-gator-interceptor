@@ -16,8 +16,8 @@ The *Interceptor App* image is pushed to [quay.io/ecosystem-appeng/gator-api-int
 
 ## Request Headers
 
-All known headers from [APIGator Docs][2] can be added to the original request, and they will be chained to APIGator
-requests. This allows the user to override any headers per-request.
+All known headers from [APIGator Docs][2] can be added to the original request, and they will override headers in
+APIGator requests. This allows the user to override any headers per-request.
 
 The following headers are unique to the *Interceptor App* and will not appear in [APIGator Docs][2].
 
