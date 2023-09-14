@@ -45,7 +45,7 @@ public class TrafficInterceptor {
 
     @Route(regex = ".*")
     public void handle(RoutingContext context) {
-        Log.tracef("got new request, %s", context.request().absoluteURI());
+        Log.debugf("got new request, %s", context.request().absoluteURI());
         // create target request options using origin request and target host and port
         var targetRequestOpts = RequestOptionsFactory.createTargetOptions(target, context.request());
         // wrap target request
@@ -55,12 +55,16 @@ public class TrafficInterceptor {
             .ssl(this.target.secure())
             .sendBuffer(context.body().buffer())
             .onSuccess(handlerTargetResponse(context))
-            .onFailure(handleErrors("failed proxying request to target", 500, context));
+            .onFailure(handleExceptions("failed proxying request to target", 500, context));
     }
 
     private Handler<HttpResponse<Buffer>> handlerTargetResponse(RoutingContext context) {
         return targetResponse -> {
             Log.info("proxying request to target successful");
+            if (targetResponse.statusCode() != 200) {
+                handleErrors(targetResponse, context);
+                return;
+            }
             var bypass = context.request().getHeader(RequestHeaders.Api_Gator_Bypass.toString());
             if (Objects.nonNull(bypass) && bypass.equals("true")) {
                 Log.info("bypassing gator and returning target response");
@@ -81,7 +85,7 @@ public class TrafficInterceptor {
                 .ssl(true)
                 .sendBuffer(Buffer.buffer(tokenReqPayload.toString()))
                 .onSuccess(handleTokenResponse(context, targetResponse))
-                .onFailure(handleErrors("failed fetching token from gator", 500, context));
+                .onFailure(handleExceptions("failed fetching token from gator", 500, context));
 
         };
     }
@@ -89,11 +93,15 @@ public class TrafficInterceptor {
     private Handler<HttpResponse<Buffer>> handleTokenResponse(RoutingContext context, HttpResponse<Buffer> targetResponse) {
         return tokenResponse -> {
             Log.info("sending token request to gator successful");
+            if (tokenResponse.statusCode() != 200) {
+                handleErrors(tokenResponse, context);
+                return;
+            }
             TokenResponse parsedTokenResp = null;
             try {
                 parsedTokenResp = mapper.readValue(tokenResponse.bodyAsString(), TokenResponse.class);
             } catch (JsonProcessingException e) {
-                handleErrors("failed parsing gator token response", 400, context).handle(e);
+                handleExceptions("failed parsing gator token response", 400, context).handle(e);
                 return;
             }
             // create dataset request options
@@ -107,25 +115,29 @@ public class TrafficInterceptor {
             try {
                 datasetReqStr = mapper.writeValueAsString(datasetReqPayload);
             } catch (JsonProcessingException e) {
-                handleErrors("failed parsing gator request payload", 400, context).handle(e);
+                handleExceptions("failed parsing gator request payload", 400, context).handle(e);
                 return;
             }
             datasetRequest
                 .ssl(true)
                 .sendBuffer(Buffer.buffer(datasetReqStr))
                 .onSuccess(handleDatasetResponse(context, targetResponse))
-                .onFailure(handleErrors("failed intercepting response with gator", 500, context));
+                .onFailure(handleExceptions("failed intercepting response with gator", 500, context));
         };
     }
 
     private Handler<HttpResponse<Buffer>> handleDatasetResponse(RoutingContext context, HttpResponse<Buffer> targetResponse) {
         return datasetResponse -> {
             Log.info("sending dataset request to gator successful");
+            if (targetResponse.statusCode() != 200) {
+                handleErrors(datasetResponse, context);
+                return;
+            }
             DatasetResponse parsedDatasetResp = null;
             try {
                 parsedDatasetResp = mapper.readValue(datasetResponse.bodyAsString(), DatasetResponse.class);
             } catch (JsonProcessingException e) {
-                handleErrors("failed parsing gator dataset response", 400, context).handle(e);
+                handleExceptions("failed parsing gator dataset response", 400, context).handle(e);
                 return;
             }
             Log.info("returning gator dataset as response");
@@ -138,7 +150,14 @@ public class TrafficInterceptor {
         };
     }
 
-    private Handler<Throwable> handleErrors(String msg, int code, RoutingContext context) {
+    private void handleErrors(HttpResponse<Buffer> response, RoutingContext context) {
+        Log.error(response.statusMessage());
+        Log.debug(response.body());
+        context.response().setStatusCode(response.statusCode());
+        context.response().end(response.statusMessage());
+    }
+
+    private Handler<Throwable> handleExceptions(String msg, int code, RoutingContext context) {
         return t -> {
             Log.error(msg, t);
             context.response().setStatusCode(code);
