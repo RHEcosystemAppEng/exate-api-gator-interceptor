@@ -87,7 +87,7 @@ public class InterceptorApp {
                 return;
             }
             // create token request options
-            var tokenReqOpts = RequestOptionsFactory.createTokenOptions(this.config);
+            var tokenReqOpts = RequestOptionsFactory.createTokenOptions(this.config, context.request().headers());
             // build token request payload
             var tokenReqPayload = PayloadFactory.createTokenPayload(this.config);
             // create token request
@@ -123,7 +123,8 @@ public class InterceptorApp {
                 return;
             }
             // create dataset request options
-            var datasetReqOpts = RequestOptionsFactory.createDatasetOptions(this.config, parsedTokenResp);
+            var datasetReqOpts = RequestOptionsFactory.createDatasetOptions(
+                this.config, parsedTokenResp, context.request().headers());
             // build dataset request payload
             var datasetReqPayload = PayloadFactory.createDatasetPayload(this.config, targetResponse.bodyAsString());
             // create dataset request
