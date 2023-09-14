@@ -1,4 +1,4 @@
-package exate.gator.interceptor.api;
+package exate.gator.interceptor.content;
 
 import java.util.Objects;
 

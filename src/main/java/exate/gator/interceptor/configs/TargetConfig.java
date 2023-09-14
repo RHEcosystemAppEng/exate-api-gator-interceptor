@@ -1,4 +1,4 @@
-package exate.gator.interceptor;
+package exate.gator.interceptor.configs;
 
 import io.smallrye.config.ConfigMapping;
 import jakarta.validation.constraints.NotBlank;

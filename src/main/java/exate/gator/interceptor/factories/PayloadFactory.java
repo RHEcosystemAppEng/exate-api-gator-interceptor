@@ -1,10 +1,8 @@
 package exate.gator.interceptor.factories;
 
-import exate.gator.interceptor.api.ApiConfig;
-import exate.gator.interceptor.api.DatasetPayload;
-import exate.gator.interceptor.api.TokenPayload;
-import io.vertx.core.buffer.Buffer;
-import io.vertx.ext.web.client.HttpResponse;
+import exate.gator.interceptor.configs.ApiConfig;
+import exate.gator.interceptor.content.DatasetPayload;
+import exate.gator.interceptor.content.TokenPayload;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;

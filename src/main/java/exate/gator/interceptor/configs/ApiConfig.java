@@ -1,5 +1,6 @@
-package exate.gator.interceptor.api;
+package exate.gator.interceptor.configs;
 
+import exate.gator.interceptor.content.DatasetPayload;
 import exate.gator.interceptor.constraints.CountryCode;
 import io.smallrye.config.ConfigMapping;
 import jakarta.validation.constraints.NotBlank;

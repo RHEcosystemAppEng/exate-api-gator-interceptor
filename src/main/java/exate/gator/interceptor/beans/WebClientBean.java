@@ -1,4 +1,4 @@
-package exate.gator.interceptor;
+package exate.gator.interceptor.beans;
 
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.client.WebClient;

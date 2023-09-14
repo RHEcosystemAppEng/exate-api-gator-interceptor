@@ -1,10 +1,10 @@
 package exate.gator.interceptor.factories;
 
-import exate.gator.interceptor.TargetConfig;
-import exate.gator.interceptor.api.ApiConfig;
-import exate.gator.interceptor.api.DatasetPayload;
-import exate.gator.interceptor.api.RequestHeaders;
-import exate.gator.interceptor.api.TokenResponse;
+import exate.gator.interceptor.configs.TargetConfig;
+import exate.gator.interceptor.configs.ApiConfig;
+import exate.gator.interceptor.content.DatasetPayload;
+import exate.gator.interceptor.content.RequestHeaders;
+import exate.gator.interceptor.content.TokenResponse;
 import io.vertx.core.MultiMap;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServerRequest;

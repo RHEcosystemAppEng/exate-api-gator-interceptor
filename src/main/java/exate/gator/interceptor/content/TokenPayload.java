@@ -1,4 +1,4 @@
-package exate.gator.interceptor.api;
+package exate.gator.interceptor.content;
 
 /**
  * Record for serializing the payload for sending TOKEN requests to API-Gator.

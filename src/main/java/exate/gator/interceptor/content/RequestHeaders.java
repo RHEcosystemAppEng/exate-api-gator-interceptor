@@ -1,4 +1,4 @@
-package exate.gator.interceptor.api;
+package exate.gator.interceptor.content;
 
 /** Various headers used by API-Gator and the interceptor application. */
 public enum RequestHeaders {
