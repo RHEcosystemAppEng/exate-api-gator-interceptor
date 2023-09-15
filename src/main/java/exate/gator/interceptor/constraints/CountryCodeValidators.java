@@ -1,8 +1,8 @@
 package exate.gator.interceptor.constraints;
 
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+
 import java.util.Optional;
 import java.util.Locale;
 import java.util.Objects;

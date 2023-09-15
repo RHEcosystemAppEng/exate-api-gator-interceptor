@@ -27,8 +27,8 @@ public class MainApp {
     }
 
     /**
-     * Main entrypoint for the interceptor application, all requests stars here.
-     * @param context injected by Quarkus, used to handle requests and send responses.
+     * Main entrypoint for the interceptor application, all requests starts here.
+     * @param context injected by Quarkus, used for handling requests and responses.
      */
     @Route(regex = ".*")
     public void handle(RoutingContext context) {
@@ -39,12 +39,10 @@ public class MainApp {
         targetRequest
             .sendBuffer(context.body().buffer())
             .onSuccess(targetResponse -> {
-                Log.info("proxying request to target successful");
                 var bypass = context.request().getHeader(RequestHeaders.Api_Gator_Bypass.toString());
                 if (Objects.nonNull(bypass) && bypass.equals("true")) {
                     Log.info("bypassing gator and returning target response");
                     context.response().end(targetResponse.bodyAsBuffer());;
-                    Log.info("bypassing gator and returning target response successful");
                     return;
                 }
 
@@ -55,7 +53,6 @@ public class MainApp {
                 tokenRequest
                     .sendBuffer(Buffer.buffer(tokenReqPayload.toString()))
                     .onSuccess(tokenResponse -> {
-                        Log.info("sending token request to gator successful");
                         var datasetRequest = requests.createDatasetRequest(context, tokenResponse.body());
                         var datasetReqPayload = this.payloads.createDatasetPayload(targetResponse.bodyAsString());
 
@@ -63,14 +60,12 @@ public class MainApp {
                         datasetRequest
                             .sendJson(datasetReqPayload)
                             .onSuccess(r -> {
-                                Log.info("sending dataset request to gator successful");
                                 // grab headers from target response and set in end response
                                 targetResponse.headers().forEach((k, v) -> context.response().putHeader(k, v));
                                 context.response().putHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(r.body().dataSet().length()));
 
                                 Log.info("returning gator dataset as response");
                                 context.response().end(Buffer.buffer(r.body().dataSet()));
-                                Log.info("returning gator dataset as response successful");
                             })
                             .onFailure(handleExceptions("failed intercepting response with gator", context));
                     })

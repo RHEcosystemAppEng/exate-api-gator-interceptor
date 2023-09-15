@@ -1,7 +1,7 @@
 package exate.gator.interceptor.services;
 
+import exate.gator.interceptor.configs.GatorConfig;
 import exate.gator.interceptor.configs.TargetConfig;
-import exate.gator.interceptor.configs.ApiConfig;
 import exate.gator.interceptor.content.DatasetPayload;
 import exate.gator.interceptor.content.RequestHeaders;
 import exate.gator.interceptor.content.TokenResponse;
@@ -14,12 +14,12 @@ import jakarta.inject.Inject;
 
 @ApplicationScoped
 public class OptionsServiceImpl implements OptionsService {
-    private final ApiConfig config;
+    private final GatorConfig gator;
     private final TargetConfig target;
 
     @Inject
-    public OptionsServiceImpl(ApiConfig config, TargetConfig target) {
-        this.config = config;
+    public OptionsServiceImpl(GatorConfig gator, TargetConfig target) {
+        this.gator = gator;
         this.target = target;
     }
 
@@ -33,23 +33,23 @@ public class OptionsServiceImpl implements OptionsService {
 
     public RequestOptions createTokenOptions(MultiMap originHeaders) {
         return new RequestOptions()
-            .setHost(this.config.host())
-            .setPort(this.config.port())
-            .setURI(this.config.tokenUri())
+            .setHost(this.gator.host())
+            .setPort(this.gator.port())
+            .setURI(this.gator.tokenUri())
             .putHeader(
                 RequestHeaders.X_Api_Key.toString(),
                 originHeaders.contains(RequestHeaders.X_Api_Key.toString())
                     ? originHeaders.get(RequestHeaders.X_Api_Key.toString())
-                    : this.config.apiKey())
+                    : this.gator.apiKey())
             .putHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded");
     }
 
     public RequestOptions createDatasetOptions(TokenResponse tokenResponse, MultiMap originHeaders) {
         var opts = new RequestOptions()
-            .setHost(this.config.host())
-            .setPort(this.config.port())
-            .setURI(this.config.datasetUri())
-            .putHeader(RequestHeaders.X_Api_Key.toString(), this.config.apiKey())
+            .setHost(this.gator.host())
+            .setPort(this.gator.port())
+            .setURI(this.gator.datasetUri())
+            .putHeader(RequestHeaders.X_Api_Key.toString(), this.gator.apiKey())
             .putHeader(
                 RequestHeaders.X_Resource_Token.toString(),
                 String.format("%s %s", tokenResponse.token_type(), tokenResponse.access_token()))

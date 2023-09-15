@@ -10,7 +10,7 @@ import java.util.Optional;
 
 /** Configuration for API-Gator access. */
 @ConfigMapping(prefix = "api.gator")
-public interface ApiConfig {
+public interface GatorConfig {
     @NotBlank
     String host();
 

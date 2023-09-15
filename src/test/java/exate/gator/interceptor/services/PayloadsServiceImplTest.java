@@ -4,7 +4,7 @@ import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.thenNoException;
 import static org.mockito.BDDMockito.given;
 
-import exate.gator.interceptor.configs.ApiConfig;
+import exate.gator.interceptor.configs.GatorConfig;
 import exate.gator.interceptor.content.DatasetPayload;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,14 +18,15 @@ import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class PayloadsServiceImplTest {
-    @Mock ApiConfig config;
+    @Mock
+    GatorConfig gator;
     @InjectMocks PayloadsServiceImpl sut;
 
     @Test
     void test_token_payload_factory() {
-        given(config.clientId()).willReturn("dummy-client-id");
-        given(config.clientSecret()).willReturn("dummy-client-secret");
-        given(config.grantType()).willReturn("dummy-grant-type");
+        given(gator.clientId()).willReturn("dummy-client-id");
+        given(gator.clientSecret()).willReturn("dummy-client-secret");
+        given(gator.grantType()).willReturn("dummy-grant-type");
 
         var payload = sut.createTokenPayload();
 
@@ -39,11 +40,11 @@ class PayloadsServiceImplTest {
 
         @Test
         void test_dataset_payload_factory_with_minimal_config() {
-            given(config.manifestName()).willReturn("fake-manifest");
-            given(config.jobType()).willReturn(DatasetPayload.JobType.Encrypt);
-            given(config.countryCode()).willReturn("GB");
-            given(config.protectNullValues()).willReturn(false);
-            given(config.preserveStringLength()).willReturn(true);
+            given(gator.manifestName()).willReturn("fake-manifest");
+            given(gator.jobType()).willReturn(DatasetPayload.JobType.Encrypt);
+            given(gator.countryCode()).willReturn("GB");
+            given(gator.protectNullValues()).willReturn(false);
+            given(gator.preserveStringLength()).willReturn(true);
 
             var payload = sut.createDatasetPayload(dataset);
 
@@ -59,19 +60,19 @@ class PayloadsServiceImplTest {
 
         @Test
         void test_dataset_payload_factory_with_full_config() {
-            given(config.manifestName()).willReturn("fake-manifest");
-            given(config.jobType()).willReturn(DatasetPayload.JobType.Encrypt);
-            given(config.countryCode()).willReturn("GB");
-            given(config.protectNullValues()).willReturn(false);
-            given(config.preserveStringLength()).willReturn(true);
+            given(gator.manifestName()).willReturn("fake-manifest");
+            given(gator.jobType()).willReturn(DatasetPayload.JobType.Encrypt);
+            given(gator.countryCode()).willReturn("GB");
+            given(gator.protectNullValues()).willReturn(false);
+            given(gator.preserveStringLength()).willReturn(true);
 
-            given(config.thirdPartyName()).willReturn(Optional.of("fake-third-party-name"));
-            given(config.thirdPartyId()).willReturn(Optional.of(98));
-            given(config.dataOwningCountryCode()).willReturn(Optional.of("GB"));
-            given(config.dataUsageId()).willReturn(Optional.of(89));
-            given(config.restrictedText()).willReturn(Optional.of("****"));
-            given(config.sqlType()).willReturn(Optional.of(DatasetPayload.SqlType.Dremio));
-            given(config.classificationModel()).willReturn(Optional.of("fake-classification-model"));
+            given(gator.thirdPartyName()).willReturn(Optional.of("fake-third-party-name"));
+            given(gator.thirdPartyId()).willReturn(Optional.of(98));
+            given(gator.dataOwningCountryCode()).willReturn(Optional.of("GB"));
+            given(gator.dataUsageId()).willReturn(Optional.of(89));
+            given(gator.restrictedText()).willReturn(Optional.of("****"));
+            given(gator.sqlType()).willReturn(Optional.of(DatasetPayload.SqlType.Dremio));
+            given(gator.classificationModel()).willReturn(Optional.of("fake-classification-model"));
 
             var payload = sut.createDatasetPayload(dataset);
 
