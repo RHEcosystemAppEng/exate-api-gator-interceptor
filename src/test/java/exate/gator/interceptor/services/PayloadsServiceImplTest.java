@@ -1,11 +1,11 @@
 package exate.gator.interceptor.services;
 
-import static org.assertj.core.api.BDDAssertions.then;
-import static org.assertj.core.api.BDDAssertions.thenNoException;
-import static org.mockito.BDDMockito.given;
+import static org.assertj.core.api.BDDAssertions.*;
+import static org.mockito.BDDMockito.*;
 
 import exate.gator.interceptor.configs.GatorConfig;
 import exate.gator.interceptor.content.DatasetPayload;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,12 +18,11 @@ import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class PayloadsServiceImplTest {
-    @Mock
-    GatorConfig gator;
+    @Mock GatorConfig gator;
     @InjectMocks PayloadsServiceImpl sut;
 
     @Test
-    void test_token_payload_factory() {
+    void create_a_token_payload_and_verify_expected_to_string_implementation() {
         given(gator.clientId()).willReturn("dummy-client-id");
         given(gator.clientSecret()).willReturn("dummy-client-secret");
         given(gator.grantType()).willReturn("dummy-grant-type");
@@ -38,14 +37,17 @@ class PayloadsServiceImplTest {
     class TestDatasetFactory {
         String dataset = "{\"this_is\": \"a_fake_dataset\"}";
 
-        @Test
-        void test_dataset_payload_factory_with_minimal_config() {
-            given(gator.manifestName()).willReturn("fake-manifest");
-            given(gator.jobType()).willReturn(DatasetPayload.JobType.Encrypt);
-            given(gator.countryCode()).willReturn("GB");
-            given(gator.protectNullValues()).willReturn(false);
-            given(gator.preserveStringLength()).willReturn(true);
+        @BeforeEach
+        void initialize() {
+            when(gator.manifestName()).thenReturn("fake-manifest");
+            when(gator.jobType()).thenReturn(DatasetPayload.JobType.Encrypt);
+            when(gator.countryCode()).thenReturn("GB");
+            when(gator.protectNullValues()).thenReturn(false);
+            when(gator.preserveStringLength()).thenReturn(true);
+        }
 
+        @Test
+        void create_a_dataset_payload_with_only_the_mandatory_configuration_and_verify() {
             var payload = sut.createDatasetPayload(dataset);
 
             then(payload.dataSet()).isEqualTo(dataset);
@@ -59,13 +61,7 @@ class PayloadsServiceImplTest {
         }
 
         @Test
-        void test_dataset_payload_factory_with_full_config() {
-            given(gator.manifestName()).willReturn("fake-manifest");
-            given(gator.jobType()).willReturn(DatasetPayload.JobType.Encrypt);
-            given(gator.countryCode()).willReturn("GB");
-            given(gator.protectNullValues()).willReturn(false);
-            given(gator.preserveStringLength()).willReturn(true);
-
+        void create_a_dataset_payload_with_a_full_configuration_and_verify() {
             given(gator.thirdPartyName()).willReturn(Optional.of("fake-third-party-name"));
             given(gator.thirdPartyId()).willReturn(Optional.of(98));
             given(gator.dataOwningCountryCode()).willReturn(Optional.of("GB"));

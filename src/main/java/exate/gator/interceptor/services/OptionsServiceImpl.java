@@ -2,7 +2,6 @@ package exate.gator.interceptor.services;
 
 import exate.gator.interceptor.configs.GatorConfig;
 import exate.gator.interceptor.configs.TargetConfig;
-import exate.gator.interceptor.content.DatasetPayload;
 import exate.gator.interceptor.content.RequestHeaders;
 import exate.gator.interceptor.content.TokenResponse;
 import io.vertx.core.MultiMap;
@@ -53,12 +52,12 @@ public class OptionsServiceImpl implements OptionsService {
             .putHeader(
                 RequestHeaders.X_Resource_Token.toString(),
                 String.format("%s %s", tokenResponse.token_type(), tokenResponse.access_token()))
-            .putHeader(RequestHeaders.X_Data_Set_Type.toString(), DatasetPayload.DatasetType.JSON.toString())
+            .putHeader(RequestHeaders.X_Data_Set_Type.toString(), gator.datasetType().name())
             .putHeader(HttpHeaders.CONTENT_TYPE, "application/json");
 
         // override api-gator headers with the ones from the original request exist.
         for (var header: RequestHeaders.values()) {
-            var key = header.name();
+            var key = header.toString();
             if (originHeaders.contains(key)) {
                 opts.putHeader(key, originHeaders.get(key));
             }

@@ -35,6 +35,9 @@ public interface GatorConfig {
     @NotBlank
     String grantType();
 
+    @NotNull
+    DatasetPayload.DatasetType datasetType();
+
     @NotBlank
     String manifestName();
 
