@@ -1,8 +1,11 @@
 package exate.gator.interceptor.content;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.Objects;
 
 /** Record for serializing the payload for sending DATASET requests to API-Gator. */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record DatasetPayload(
     String manifestName,
     JobType jobType,
