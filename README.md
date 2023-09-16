@@ -1,6 +1,6 @@
 # Exate API-Gator Interceptor
 
-Application build with [Quarkus][0] used for injecting [Exate's API-Gator][1] by intercepting responses from any
+Application build with [Quarkus][0] used for injecting [Exate's API-Gator][1] by intercepting requests to any
 target application.
 
 ```mermaid
@@ -26,16 +26,15 @@ sequenceDiagram
 - Configure and deploy the *Interceptor App* next to the *Target App*, preferably as a sidecar container.
 - Redirect the *Target App*'s exposed service to the *Interceptor App*.
 
-For any request received, the *Interceptor App* will access the *Target App* on the sender's behalf, it will then
-send the *Target App*'s response as a dataset to *API-Gator*, and return the *Gator'ed* dataset and a response to
-the sender.
+For any request, the *Interceptor App* will access the *Target App* and fetch the original dataset, it will then
+send the dataset to *API-Gator*, and return the *Gator'ed* dataset as a response to the sender.
 
 The *Interceptor App* image is pushed to [quay.io/ecosystem-appeng/gator-api-interceptor][3]
 
 ## Request Headers
 
 All known headers from [APIGator Docs][2] can be added to the original request, and they will override headers in
-APIGator requests. This allows the user to override any headers per-request.
+APIGator requests. This allows users to override any headers per-request.
 
 The following headers are unique to the *Interceptor App* and will not appear in [APIGator Docs][2].
 
