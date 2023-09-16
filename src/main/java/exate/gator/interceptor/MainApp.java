@@ -33,7 +33,7 @@ public class MainApp {
     @Route(regex = ".*")
     public void handle(RoutingContext context) {
         Log.debugf("got new request, %s", context.request().absoluteURI());
-        var targetRequest = requests.createTargetRequest(context);
+        var targetRequest = this.requests.createTargetRequest(context);
 
         Log.info("proxying request to target");
         targetRequest.sendBuffer(context.body().buffer())
@@ -45,13 +45,13 @@ public class MainApp {
                     return;
                 }
 
-                var tokenRequest = requests.createTokenRequest(context);
+                var tokenRequest = this.requests.createTokenRequest(context);
                 var tokenReqPayload = this.payloads.createTokenPayload();
 
                 Log.info("sending token request to gator");
                 tokenRequest.sendBuffer(Buffer.buffer(tokenReqPayload.toString()))
                     .onSuccess(tokenResponse -> {
-                        var datasetRequest = requests.createDatasetRequest(context, tokenResponse.body());
+                        var datasetRequest = this.requests.createDatasetRequest(context, tokenResponse.body());
                         var datasetReqPayload = this.payloads.createDatasetPayload(targetResponse.bodyAsString());
 
                         Log.info("sending dataset request to gator");
