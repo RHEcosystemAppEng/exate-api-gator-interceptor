@@ -1,7 +1,22 @@
 # Exate API-Gator Interceptor
 
 Application build with [Quarkus][0] used for injecting [Exate's API-Gator][1] by intercepting responses from any
-configured application.
+target application.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Users
+    participant S as Service<br/>Route
+    U-)S: Send requests to target
+    create participant I as Interceptor<br/>(sidecar)
+    S-)I: Intercept requests
+    create participant T as Target<br/>Application
+    I-)T: Fetch dataset from target
+    create participant G as Exate<br/>APIGator
+    I-)G: Protect data in dataset
+    I-)U: Return protected dataset
+```
 
 ## Usage
 
