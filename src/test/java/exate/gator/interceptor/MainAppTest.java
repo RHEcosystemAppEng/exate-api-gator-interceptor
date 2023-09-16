@@ -3,7 +3,7 @@ package exate.gator.interceptor;
 import static org.assertj.core.api.BDDAssertions.*;
 import static org.mockito.BDDMockito.*;
 
-import exate.gator.interceptor.content.RequestHeaders;
+import exate.gator.interceptor.content.*;
 import exate.gator.interceptor.services.PayloadsService;
 import exate.gator.interceptor.services.RequestsService;
 import io.vertx.core.Future;
@@ -15,6 +15,7 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -45,14 +46,49 @@ class MainAppTest {
         when(originalRequestBody.buffer()).thenReturn(originalRequestBuffer);
         when(context.body()).thenReturn(originalRequestBody);
         when(targetRequest.sendBuffer(originalRequestBuffer)).thenReturn(Future.succeededFuture(targetResponse));
-        when(targetResponse.bodyAsBuffer()).thenReturn(targetResponseBuffer);
-        when(response.end(targetResponseBuffer)).thenReturn(Future.succeededFuture());
     }
 
     @Test
     void handling_requests_with_bypass_header_should_return_target_response() {
+        given(targetResponse.bodyAsBuffer()).willReturn(targetResponseBuffer);
+        given(response.end(targetResponseBuffer)).willReturn(Future.succeededFuture());
         given(originalRequest.getHeader(RequestHeaders.Api_Gator_Bypass.toString())).willReturn("true");
+
         sut.handle(context); // no assert is required, in strict mocking mode, no error is enough
+    }
+
+    @Test
+    @Disabled
+    void handling_requests_without_bypass_header_should_return_dataset_response(
+        @Mock HttpRequest<TokenResponse> tokenRequest,
+        @Mock TokenPayload tokenPayload,
+        @Mock HttpResponse<TokenResponse> tokenHttpResponse,
+        @Mock TokenResponse tokenResponse,
+        @Mock HttpRequest<DatasetResponse> datasetRequest,
+        @Mock DatasetPayload datasetPayload,
+        @Mock HttpResponse<DatasetResponse> datasetHttpResponse,
+        @Mock DatasetResponse datasetResponse
+    ) {
+        given(requests.createTokenRequest(context)).willReturn(tokenRequest);
+        given(payloads.createTokenPayload()).willReturn(tokenPayload);
+
+        given(tokenHttpResponse.body()).willReturn(tokenResponse);
+        given(tokenRequest.sendBuffer(Buffer.buffer(tokenPayload.toString())))
+            .willReturn(Future.succeededFuture(tokenHttpResponse));
+
+        var fakeOrigDataset = "{\"this_is\": \"a_fake_dataset\"}";
+        given(targetResponse.bodyAsString()).willReturn(fakeOrigDataset);
+        given(requests.createDatasetRequest(context, tokenResponse)).willReturn(datasetRequest);
+        given(payloads.createDatasetPayload(fakeOrigDataset)).willReturn(datasetPayload);
+
+        var fakeMaskedDataset = "{\"this_is\": \"a_fake_masked_dataset\"}";
+        given(datasetResponse.dataSet()).willReturn(fakeMaskedDataset);
+        given(datasetHttpResponse.body()).willReturn(datasetResponse);
+        given(datasetRequest.sendJson(datasetPayload)).willReturn(Future.succeededFuture(datasetHttpResponse));
+
+        // TODO add headers wiring
+        sut.handle(context);
+        // TODO add response assertion
     }
 
 }
