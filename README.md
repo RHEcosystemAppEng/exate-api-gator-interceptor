@@ -8,12 +8,15 @@ sequenceDiagram
     autonumber
     actor U as Users
     participant S as Service<br/>Route
+    box Pod
+        participant I as Interceptor<br/>(sidecar)
+        participant T as Target<br/>Application
+    end
+    participant G as Exate<br/>APIGator
+
     U-)S: Send requests to target
-    create participant I as Interceptor<br/>(sidecar)
     S-)I: Intercept requests
-    create participant T as Target<br/>Application
     I-)T: Fetch dataset from target
-    create participant G as Exate<br/>APIGator
     I-)G: Protect data in dataset
     I-)U: Return protected dataset
 ```
