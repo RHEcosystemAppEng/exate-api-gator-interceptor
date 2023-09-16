@@ -36,8 +36,7 @@ public class MainApp {
         var targetRequest = requests.createTargetRequest(context);
 
         Log.info("proxying request to target");
-        targetRequest
-            .sendBuffer(context.body().buffer())
+        targetRequest.sendBuffer(context.body().buffer())
             .onSuccess(targetResponse -> {
                 var bypass = context.request().getHeader(RequestHeaders.Api_Gator_Bypass.toString());
                 if (Objects.nonNull(bypass) && bypass.equals("true")) {
@@ -50,24 +49,23 @@ public class MainApp {
                 var tokenReqPayload = this.payloads.createTokenPayload();
 
                 Log.info("sending token request to gator");
-                tokenRequest
-                    .sendBuffer(Buffer.buffer(tokenReqPayload.toString()))
+                tokenRequest.sendBuffer(Buffer.buffer(tokenReqPayload.toString()))
                     .onSuccess(tokenResponse -> {
                         var datasetRequest = requests.createDatasetRequest(context, tokenResponse.body());
                         var datasetReqPayload = this.payloads.createDatasetPayload(targetResponse.bodyAsString());
 
                         Log.info("sending dataset request to gator");
-                        datasetRequest
-                            .sendJson(datasetReqPayload)
-                            .onSuccess(r -> {
+                        datasetRequest.sendJson(datasetReqPayload)
+                            .onSuccess(datasetResponse -> {
+                                var newDataset = datasetResponse.body().dataSet();
                                 // grab headers from target response and set in end response
                                 targetResponse.headers().forEach((k, v) -> context.response().putHeader(k, v));
-                                context.response().putHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(r.body().dataSet().length()));
+                                context.response().putHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(newDataset.length()));
 
                                 Log.info("returning gator dataset as response");
-                                context.response().end(Buffer.buffer(r.body().dataSet()));
+                                context.response().end(Buffer.buffer(newDataset));
                             })
-                            .onFailure(handleExceptions("failed intercepting response with gator", context));
+                            .onFailure(handleExceptions("failed creating new dataset with gator", context));
                     })
                     .onFailure(handleExceptions("failed fetching token from gator", context));
             })
