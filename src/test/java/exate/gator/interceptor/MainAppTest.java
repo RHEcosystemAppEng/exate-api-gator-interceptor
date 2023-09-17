@@ -1,13 +1,14 @@
 package exate.gator.interceptor;
 
-import static org.assertj.core.api.BDDAssertions.*;
 import static org.mockito.BDDMockito.*;
 
 import exate.gator.interceptor.content.*;
 import exate.gator.interceptor.services.PayloadsService;
 import exate.gator.interceptor.services.RequestsService;
 import io.vertx.core.Future;
+import io.vertx.core.MultiMap;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RequestBody;
@@ -15,7 +16,6 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -58,7 +58,6 @@ class MainAppTest {
     }
 
     @Test
-    @Disabled
     void handling_requests_without_bypass_header_should_return_dataset_response(
         @Mock HttpRequest<TokenResponse> tokenRequest,
         @Mock TokenPayload tokenPayload,
@@ -67,7 +66,8 @@ class MainAppTest {
         @Mock HttpRequest<DatasetResponse> datasetRequest,
         @Mock DatasetPayload datasetPayload,
         @Mock HttpResponse<DatasetResponse> datasetHttpResponse,
-        @Mock DatasetResponse datasetResponse
+        @Mock DatasetResponse datasetResponse,
+        @Mock HttpServerResponse contextResponse
     ) {
         given(requests.createTokenRequest(context)).willReturn(tokenRequest);
         given(payloads.createTokenPayload()).willReturn(tokenPayload);
@@ -86,9 +86,19 @@ class MainAppTest {
         given(datasetHttpResponse.body()).willReturn(datasetResponse);
         given(datasetRequest.sendJson(datasetPayload)).willReturn(Future.succeededFuture(datasetHttpResponse));
 
-        // TODO add headers wiring
-        sut.handle(context);
-        // TODO add response assertion
+        var fakeHeaders = MultiMap.caseInsensitiveMultiMap();
+        fakeHeaders.add("fake-header1", "fake-value1");
+        fakeHeaders.add("fake-header2", "fake-value2");
+        given(targetResponse.headers()).willReturn(fakeHeaders);
+
+        given(contextResponse.putHeader("fake-header1", "fake-value1")).willReturn(contextResponse);
+        given(contextResponse.putHeader("fake-header2", "fake-value2")).willReturn(contextResponse);
+        given(contextResponse.putHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(fakeMaskedDataset.length()))).willReturn(contextResponse);
+
+        given(contextResponse.end(Buffer.buffer(fakeMaskedDataset))).willReturn(Future.succeededFuture());
+        given(context.response()).willReturn(contextResponse);
+
+        sut.handle(context);  // no assert is required, in strict mocking mode, no error is enough
     }
 
 }
