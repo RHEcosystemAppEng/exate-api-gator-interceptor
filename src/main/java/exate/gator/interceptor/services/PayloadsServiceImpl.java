@@ -9,6 +9,7 @@ import jakarta.inject.Inject;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 @ApplicationScoped
 public class PayloadsServiceImpl implements PayloadsService {
@@ -27,10 +28,11 @@ public class PayloadsServiceImpl implements PayloadsService {
         return new DatasetPayload(
             this.gator.manifestName(),
             this.gator.jobType(),
-            this.gator.thirdPartyName().isPresent() || this.gator.thirdPartyId().isPresent()
-                ? new DatasetPayload.ThirdPartyIdentiferPayload(
-                this.gator.thirdPartyName().orElse(null), this.gator.thirdPartyId().orElse(null))
-                : null,
+            this.gator.thirdParty().isEmpty()
+                ? null
+                : new DatasetPayload.ThirdPartyIdentiferPayload(
+                    this.gator.thirdParty().get().name().orElse(null),
+                    this.gator.thirdParty().get().id().orElse(null)),
             ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT),
             this.gator.dataOwningCountryCode().orElse(null),
             this.gator.countryCode(),
