@@ -2,6 +2,8 @@ package exate.gator.interceptor.content;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /** Record for serializing the payload for sending DATASET requests to API-Gator. */
@@ -19,7 +21,8 @@ public record DatasetPayload(
     String dataSet,
     Boolean preserveStringLength,
     SqlType sqlType,
-    String classificationModel
+    String classificationModel,
+    MatchingRule matchingRule
 
 ) {
 
@@ -30,6 +33,8 @@ public record DatasetPayload(
             }
         }
     }
+
+    public record MatchingRule (List<Map<String, String>> claims) {}
 
     public enum JobType {
         DataMasking, Pseudonymise, Reconstruct, Restrict, Encrypt, Decrypt, Default;

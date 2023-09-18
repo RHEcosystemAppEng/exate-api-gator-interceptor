@@ -6,6 +6,8 @@ import io.smallrye.config.ConfigMapping;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /** Configuration for API-Gator access. */
@@ -68,4 +70,10 @@ public interface GatorConfig {
     Optional<DatasetPayload.SqlType> sqlType();
 
     Optional<String> classificationModel();
+
+    Optional<MatchingRule> matchingrule();
+
+    interface MatchingRule {
+        List<Map<String, String>> claims();
+    }
 }

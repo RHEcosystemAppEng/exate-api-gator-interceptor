@@ -40,6 +40,9 @@ public class PayloadsServiceImpl implements PayloadsService {
             dataset,
             this.gator.preserveStringLength(),
             this.gator.sqlType().orElse(null),
-            this.gator.classificationModel().orElse(null));
+            this.gator.classificationModel().orElse(null),
+            this.gator.matchingrule().isEmpty() || this.gator.matchingrule().get().claims().isEmpty()
+                ? null
+                : new DatasetPayload.MatchingRule(this.gator.matchingrule().get().claims()));
     }
 }

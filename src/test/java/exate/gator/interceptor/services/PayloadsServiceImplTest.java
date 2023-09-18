@@ -16,6 +16,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -80,6 +82,15 @@ class PayloadsServiceImplTest {
             given(gator.sqlType()).willReturn(Optional.of(DatasetPayload.SqlType.Dremio));
             given(gator.classificationModel()).willReturn(Optional.of("fake-classification-model"));
 
+            var dummyClaimObj = Map.of("dummy-claim-key", "dummy-claim-value");
+            class MatchingRuleConf implements GatorConfig.MatchingRule {
+                @Override
+                public List<Map<String, String>> claims() {
+                    return List.of(dummyClaimObj);
+                }
+            }
+            given(gator.matchingrule()).willReturn(Optional.of(new MatchingRuleConf()));
+
             var payload = sut.createDatasetPayload(dataset);
 
             then(payload.thirdPartyIdentifer().thirdPartyName()).isEqualTo("fake-third-party-name");
@@ -89,6 +100,7 @@ class PayloadsServiceImplTest {
             then(payload.restrictedText()).isEqualTo("****");
             then(payload.sqlType()).isEqualTo(DatasetPayload.SqlType.Dremio);
             then(payload.classificationModel()).isEqualTo("fake-classification-model");
+            then(payload.matchingRule().claims()).containsOnly(dummyClaimObj);
         }
     }
 }
