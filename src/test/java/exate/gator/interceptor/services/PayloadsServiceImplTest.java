@@ -13,6 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
@@ -23,14 +25,22 @@ class PayloadsServiceImplTest {
 
     @Test
     void create_a_token_payload_and_verify_expected_to_string_implementation() {
-        given(gator.clientId()).willReturn("dummy-client-id");
-        given(gator.clientSecret()).willReturn("dummy-client-secret");
-        given(gator.grantType()).willReturn("dummy-grant-type");
+        var fakeClientId = "dummy-client-id";
+        var fakeClientSecret = "dummy-client-secret=;%^";
+        var fakeGrantType = "dummy-grant-type";
+
+        given(gator.clientId()).willReturn(fakeClientId);
+        given(gator.clientSecret()).willReturn(fakeClientSecret);
+        given(gator.grantType()).willReturn(fakeGrantType);
 
         var payload = sut.createTokenPayload();
 
         then(payload.toString()) // unique toString implementation should contain the mocks values in its structure
-            .isEqualTo("client_id=dummy-client-id&client_secret=dummy-client-secret&grant_type=dummy-grant-type");
+            .isEqualTo(
+                "client_id=%s&client_secret=%s&grant_type=%s",
+                URLEncoder.encode(fakeClientId, StandardCharsets.UTF_8),
+                URLEncoder.encode(fakeClientSecret, StandardCharsets.UTF_8),
+                URLEncoder.encode(fakeGrantType, StandardCharsets.UTF_8));
     }
 
     @Nested
