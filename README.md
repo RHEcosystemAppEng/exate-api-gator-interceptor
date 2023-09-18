@@ -74,6 +74,9 @@ The following headers are unique to the *Interceptor App* and will not appear in
 | api.gator.third-party.id           | API_GATOR_THIRD_PARTY_ID           |    No    |                              |
 | api.gator.matchingrule.claims[#].X | API_GATOR_MATCHINGRULE_CLAIMS_#__X |    No    |                              |
 
+> Note that *api.gator.third-party.name* and *api.gator.third-party.id* are mutually exclusive. If both are set, only
+> the name will be used. The id will be set to null.
+
 > Example for *api.gator.matchingrule.claims[#].X* property is: **api.gator.matchingrule.claims[0].mykey=myvalue**.<br/>
 > Example for *API_GATOR_MATCHINGRULE_CLAIMS_#__X* env var is: **API_GATOR_MATCHINGRULE_CLAIMS_0__MYKEY=MYVALUE**<br/>
 > *0* is the index of the *claims* list, *mykey=myvalue* is one of the objects in a *claim* object. Note the double underscore.
