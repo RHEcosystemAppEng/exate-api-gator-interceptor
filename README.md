@@ -60,7 +60,7 @@ The following headers are unique to the *Interceptor App* and will not appear in
 | api.gator.client-secret            | API_GATOR_CLIENT_SECRET            |   Yes    |                              |
 | api.gator.grant-type               | API_GATOR_GRANT_TYPE               |    No    | client_credentials           |
 | api.gator.manifest-name            | API_GATOR_MANIFEST_NAME            |   Yes    |                              |
-| %dev.api.gator.dataset-type        | API_GATOR_DATASET_TYPE             |   Yes    |                              |
+| api.gator.dataset-type             | API_GATOR_DATASET_TYPE             |   Yes    |                              |
 | api.gator.job-type                 | API_GATOR_JOB_TYPE                 |   Yes    |                              |
 | api.gator.country-code             | API_GATOR_COUNTRY_CODE             |   Yes    |                              |
 | api.gator.data-owning-country-code | API_GATOR_DATA_OWNING_COUNTRY_CODE |    No    |                              |
