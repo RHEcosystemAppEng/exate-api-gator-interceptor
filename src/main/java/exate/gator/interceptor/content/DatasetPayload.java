@@ -26,10 +26,17 @@ public record DatasetPayload(
 
 ) {
 
-    public record ThirdPartyIdentiferPayload (String thirdPartyName, Integer thirdPartyId){
-        public ThirdPartyIdentiferPayload {
+    public record ThirdPartyIdentiferPayload(String thirdPartyName, Integer thirdPartyId) {
+        public ThirdPartyIdentiferPayload(String thirdPartyName, Integer thirdPartyId) {
             if (Objects.isNull(thirdPartyName) && Objects.isNull(thirdPartyId)) {
                 throw new IllegalArgumentException("one of thirdPartyName or thirdPartyId must not be null");
+            }
+            if (Objects.nonNull(thirdPartyName)) {
+                this.thirdPartyName = thirdPartyName;
+                this.thirdPartyId = null;
+            } else {
+                this.thirdPartyName = null;
+                this.thirdPartyId = thirdPartyId;
             }
         }
     }

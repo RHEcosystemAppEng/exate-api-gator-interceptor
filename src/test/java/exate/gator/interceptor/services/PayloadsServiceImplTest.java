@@ -74,8 +74,6 @@ class PayloadsServiceImplTest {
 
         @Test
         void create_a_dataset_payload_with_a_full_configuration_and_verify() {
-            given(gator.thirdPartyName()).willReturn(Optional.of("fake-third-party-name"));
-            given(gator.thirdPartyId()).willReturn(Optional.of(98));
             given(gator.dataOwningCountryCode()).willReturn(Optional.of("GB"));
             given(gator.dataUsageId()).willReturn(Optional.of(89));
             given(gator.restrictedText()).willReturn(Optional.of("****"));
@@ -93,8 +91,6 @@ class PayloadsServiceImplTest {
 
             var payload = sut.createDatasetPayload(dataset);
 
-            then(payload.thirdPartyIdentifer().thirdPartyName()).isEqualTo("fake-third-party-name");
-            then(payload.thirdPartyIdentifer().thirdPartyId()).isEqualTo(98);
             then(payload.dataOwningCountryCode()).isEqualTo("GB");
             then(payload.dataUsageId()).isEqualTo(89);
             then(payload.restrictedText()).isEqualTo("****");
@@ -102,5 +98,34 @@ class PayloadsServiceImplTest {
             then(payload.classificationModel()).isEqualTo("fake-classification-model");
             then(payload.matchingRule().claims()).containsOnly(dummyClaimObj);
         }
-    }
+
+        @Nested
+        class TestThirdPartyIdentifiers {
+            @Mock GatorConfig.ThirdParty thirdParty;
+
+            @Test
+            void when_both_third_party_name_and_id_are_set_id_should_be_null() {
+                given(thirdParty.name()).willReturn(Optional.of("fake-third-party-name"));
+                given(thirdParty.id()).willReturn(Optional.of(98));
+                given(gator.thirdParty()).willReturn(Optional.of(thirdParty));
+
+                var payload = sut.createDatasetPayload(dataset);
+
+                then(payload.thirdPartyIdentifer().thirdPartyName()).isEqualTo("fake-third-party-name");
+                then(payload.thirdPartyIdentifer().thirdPartyId()).isEqualTo(null);
+            }
+
+            @Test
+            void when_only_third_party_id_is_set_name_should_be_null() {
+                given(thirdParty.name()).willReturn(Optional.empty());
+                given(thirdParty.id()).willReturn(Optional.of(98));
+                given(gator.thirdParty()).willReturn(Optional.of(thirdParty));
+
+                var payload = sut.createDatasetPayload(dataset);
+
+                then(payload.thirdPartyIdentifer().thirdPartyName()).isEqualTo(null);
+                then(payload.thirdPartyIdentifer().thirdPartyId()).isEqualTo(98);
+            }
+        }
+     }
 }

@@ -70,8 +70,8 @@ The following headers are unique to the *Interceptor App* and will not appear in
 | api.gator.preserve-string-length   | API_GATOR_PRESERVE_STRING_LENGTH   |   Yes    |                              |
 | api.gator.sql-type                 | API_GATOR_SQL_TYPE                 |    No    |                              |
 | api.gator.classification-model     | API_GATOR_CLASSIFICATION_MODEL     |    No    |                              |
-| api.gator.third-party-name         | API_GATOR_THIRD_PARTY_NAME         |    No    |                              |
-| api.gator.third-party-id           | API_GATOR_THIRD_PARTY_ID           |    No    |                              |
+| api.gator.third-party.name         | API_GATOR_THIRD_PARTY_NAME         |    No    |                              |
+| api.gator.third-party.id           | API_GATOR_THIRD_PARTY_ID           |    No    |                              |
 | api.gator.matchingrule.claims[#].X | API_GATOR_MATCHINGRULE_CLAIMS_#__X |    No    |                              |
 
 > Example for *api.gator.matchingrule.claims[#].X* property is: **api.gator.matchingrule.claims[0].mykey=myvalue**.<br/>

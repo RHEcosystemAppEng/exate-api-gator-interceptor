@@ -46,9 +46,12 @@ public interface GatorConfig {
     @NotNull
     DatasetPayload.JobType jobType();
 
-    Optional<String> thirdPartyName();
+    Optional<ThirdParty> thirdParty();
 
-    Optional<Integer> thirdPartyId();
+    interface ThirdParty {
+        Optional<String> name();
+        Optional<Integer> id();
+    }
 
     @NotBlank
     @CountryCode.CountryCodeString
