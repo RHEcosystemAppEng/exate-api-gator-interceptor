@@ -72,6 +72,11 @@ The following headers are unique to the *Interceptor App* and will not appear in
 | api.gator.classification-model     | API_GATOR_CLASSIFICATION_MODEL     |    No    |                              |
 | api.gator.third-party-name         | API_GATOR_THIRD_PARTY_NAME         |    No    |                              |
 | api.gator.third-party-id           | API_GATOR_THIRD_PARTY_ID           |    No    |                              |
+| api.gator.matchingrule.claims[#].X | API_GATOR_MATCHINGRULE_CLAIMS_#__X |    No    |                              |
+
+> Example for *api.gator.matchingrule.claims[#].X* property is: **api.gator.matchingrule.claims[0].mykey=myvalue**.<br/>
+> Example for *API_GATOR_MATCHINGRULE_CLAIMS_#__X* env var is: **API_GATOR_MATCHINGRULE_CLAIMS_0__MYKEY=MYVALUE**<br/>
+> *0* is the index of the *claims* list, *mykey=myvalue* is one of the objects in a *claim* object. Note the double underscore.
 
 ## Local Container Run
 
