@@ -28,7 +28,7 @@ public class PayloadsServiceImpl implements PayloadsService {
         return new DatasetPayload(
             this.gator.manifestName(),
             this.gator.jobType(),
-            this.gator.thirdParty().isEmpty()
+            this.gator.thirdParty().isEmpty() // thirdParty.name and thirdParty.id are mutually exclusive
                 || (this.gator.thirdParty().get().name().isEmpty() && this.gator.thirdParty().get().id().isEmpty())
                 ? null
                 : new DatasetPayload.ThirdPartyIdentiferPayload(
